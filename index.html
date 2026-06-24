@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saurabh Kumar Singh | SDE</title>
+  <meta name="description" content="Portfolio of Saurabh Kumar Singh — building systems, not just websites.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            space: "#0c0c14",
+            surface: "#141420",
+            card: "#1c1c2a",
+            border: "rgba(255,255,255,0.05)",
+            ink: "#e8e8f0",
+            muted: "#8888a8",
+            dim: "#585878",
+            cyan: "#00d4ff",
+            purple: "#7c5cfc",
+            green: "#34d399",
+            amber: "#f59e0b",
+          },
+          fontFamily: {
+            display: ['"Inter"', '"SF Pro Display"', "system-ui", "sans-serif"],
+            body: ['"Inter"', '"SF Pro Text"', "system-ui", "sans-serif"],
+            mono: ['"JetBrains Mono"', '"Fira Code"', '"Cascadia Code"', "monospace"],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+    html { scroll-behavior: auto; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0c0c14; }
+    ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3a3a4a; }
+    * { box-sizing: border-box; }
+    .scrollbar-none::-webkit-scrollbar { display: none; }
+    .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+    .article-content h2:first-of-type { margin-top: 0; }
+    .article-content pre code { white-space: pre-wrap; }
+    .count-up { font-variant-numeric: tabular-nums; }
+    [data-scroll-section] { position: relative; }
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      will-change: opacity, transform;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-tilt {
+      transform: translateY(22px) rotateX(4deg);
+      transform-origin: top center;
+    }
+    .reveal-tilt.is-visible {
+      transform: translateY(0) rotateX(0deg);
+    }
+    .float-glow {
+      animation: floatGlow 7s ease-in-out infinite;
+    }
+    .hero-gradient {
+      background-size: 200% 200%;
+      animation: gradientShift 8s ease-in-out infinite;
+    }
+    .hero-headline {
+      animation: heroLift 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-orb {
+      animation: orbDrift 9s ease-in-out infinite;
+    }
+    .hero-orb-b {
+      animation-duration: 11s;
+      animation-delay: -2s;
+    }
+    .soft-pulse {
+      animation: softPulse 2.8s ease-in-out infinite;
+    }
+    .hover-card {
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease, background-color 0.35s ease;
+    }
+    .hover-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.08) 50%, transparent 80%);
+      transform: translateX(-140%);
+      transition: transform 0.8s ease;
+      pointer-events: none;
+    }
+    .hover-card:hover::after {
+      transform: translateX(140%);
+    }
+    .glow-border::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(0,212,255,0.28), rgba(124,92,252,0.14), transparent 60%);
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+    }
+    .glow-border:hover::before {
+      opacity: 1;
+    }
+    @keyframes floatGlow {
+      0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.28; }
+      50% { transform: translateX(-50%) translateY(14px); opacity: 0.38; }
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    @keyframes heroLift {
+      0% { opacity: 0; transform: translateY(18px) scale(0.985); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes orbDrift {
+      0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.3; }
+      50% { transform: translate3d(0, 16px, 0) scale(1.08); opacity: 0.45; }
+    }
+    @keyframes softPulse {
+      0%, 100% { opacity: 0.65; }
+      50% { opacity: 1; }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes fadeInScale {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes progressPulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+    .tilt-card {
+      transform-style: preserve-3d;
+      transition: transform 0.2s ease;
+    }
+    .tilt-card-inner {
+      transform-style: preserve-3d;
+    }
+    .tilt-card-inner > * {
+      transform-style: preserve-3d;
+    }
+    .scroll-progress {
+      background: linear-gradient(90deg, #00d4ff, #7c5cfc, #00d4ff);
+      background-size: 200% 100%;
+      animation: gradientShift 3s ease-in-out infinite;
+    }
+    .stagger-reveal > * {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .stagger-reveal.is-visible > * {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .stagger-reveal.is-visible > *:nth-child(1) { transition-delay: 0s; }
+    .stagger-reveal.is-visible > *:nth-child(2) { transition-delay: 0.08s; }
+    .stagger-reveal.is-visible > *:nth-child(3) { transition-delay: 0.16s; }
+    .stagger-reveal.is-visible > *:nth-child(4) { transition-delay: 0.24s; }
+    .stagger-reveal.is-visible > *:nth-child(5) { transition-delay: 0.32s; }
+    .stagger-reveal.is-visible > *:nth-child(6) { transition-delay: 0.40s; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .reveal,
+      .reveal.is-visible,
+      .reveal-tilt,
+      .reveal-tilt.is-visible {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+      .float-glow,
+      .hero-gradient,
+      .hero-headline,
+      .hero-orb,
+      .soft-pulse {
+        animation: none;
+      }
+      .hover-card,
+      .hover-card::after,
+      .glow-border::before,
+      .tilt-card {
+        transition: none;
+      }
+      .stagger-reveal > * {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+  </style>
+  <script>
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  </script>
+</head>
+<body class="bg-space text-ink font-body antialiased">
+  <div id="root"></div>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="app.compiled.js"></script>
+</body>
+</html>

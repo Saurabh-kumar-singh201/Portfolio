@@ -1,0 +1,1198 @@
+[
+  {
+    "id": "binary-search-monotonic",
+    "date": "March 2026",
+    "category": "Algorithms",
+    "categoryColor": "#00d4ff",
+    "title": "Why Binary Search Is Really About Monotonic Functions",
+    "preview": "I spent months thinking binary search was about sorted arrays. The real insight? It is a search on answers, not indices.",
+    "readingTime": "8 min read",
+    "topics": ["Search Space Reduction", "Monotonic Property", "Optimization Problems", "Interview Patterns"],
+    "content": [
+      {
+        "type": "h2",
+        "text": "What Problem Exists?"
+      },
+      {
+        "type": "p",
+        "text": "The first time I learned binary search, every tutorial said the same thing: \"Binary search works on sorted arrays.\" So I memorized that. Sorted array? Binary search. Unsorted? Linear search. Simple."
+      },
+      {
+        "type": "p",
+        "text": "Then I hit my first real interview problem: Find the square root of a number up to 6 decimal places without using Math.sqrt. My first instinct was Newton's method. But the follow-up changed everything: \"Can you use binary search?\" On an unsorted range of real numbers? That made no sense to me at the time."
+      },
+      {
+        "type": "p",
+        "text": "That question broke my mental model. Binary search needs a sorted array, right? But (0, x) is not an array. It is not sorted. It is just a range. So what was binary search actually doing?"
+      },
+      {
+        "type": "h2",
+        "text": "The Core Idea"
+      },
+      {
+        "type": "p",
+        "text": "Binary search is not about sorted arrays. It is about identifying a monotonic property and shrinking the search space by half until you find the boundary where the property flips."
+      },
+      {
+        "type": "p",
+        "text": "Here is the insight I was missing: Binary search works whenever you can define a predicate function P(x) that transitions from false to true (or true to false) exactly once across your search space."
+      },
+      {
+        "type": "p",
+        "text": "For the square root of 16: P(mid) = (mid * mid >= 16). For mid = 2: 4 >= 16 is false. For mid = 5: 25 >= 16 is true. Somewhere between 2 and 5, P flips from false to true. That flip point is our answer."
+      },
+      {
+        "type": "p",
+        "text": "A sorted array is just one specific case where the predicate \"is the element >= target\" happens to be monotonic. The array itself is irrelevant. The monotonic property is what matters."
+      },
+      {
+        "type": "blockquote",
+        "text": "Binary search is a search on the answer space, not on the input space."
+      },
+      {
+        "type": "h2",
+        "text": "How It Works"
+      },
+      {
+        "type": "p",
+        "text": "The algorithm reduces to three components:"
+      },
+      {
+        "type": "ol",
+        "items": [
+          "Define the search space (low, high) where the answer lies.",
+          "Define a monotonic predicate P(x) that tells you if x is a valid answer.",
+          "Repeatedly narrow the space by checking P(mid) and deciding which half to keep."
+        ]
+      },
+      {
+        "type": "p",
+        "text": "The key distinction most tutorials miss: there are two binary search templates."
+      },
+      {
+        "type": "h3",
+        "text": "Template 1: Finding an exact element"
+      },
+      {
+        "type": "p",
+        "text": "This is the classic \"search in a sorted array\" version. You check arr[mid] == target and return. Simple, but limited."
+      },
+      {
+        "type": "h3",
+        "text": "Template 2: Finding the boundary"
+      },
+      {
+        "type": "p",
+        "text": "This is the powerful version. You search for the first (or last) position where a predicate holds true. This is what enables \"binary search on answer\" problems."
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "text": "// Binary search on answer — find sqrt(16)\nlong low = 0, high = 16;\nwhile (low < high) {\n    long mid = low + (high - low + 1) / 2;\n    if (mid * mid <= 16) {\n        low = mid;  // mid might be the answer\n    } else {\n        high = mid - 1;\n    }\n}\nreturn low;"
+      },
+      {
+        "type": "p",
+        "text": "The choice of mid = low + (high - low) / 2 vs mid = low + (high - low + 1) / 2 determines whether you find the first or last occurrence of the predicate. This is the detail that separates people who memorized binary search from people who understand it."
+      },
+      {
+        "type": "h2",
+        "text": "Why It Was Designed This Way"
+      },
+      {
+        "type": "p",
+        "text": "Binary search appears in a 1946 paper by John Mauchly, but the first correct implementation was published in 1960 — and it still had bugs. The famous 2006 Google blog post by Joshua Bloch revealed that the binary search in Java's Arrays.binarySearch had an integer overflow bug that went unnoticed for a decade."
+      },
+      {
+        "type": "p",
+        "text": "The bug? (low + high) / 2 overflows for large arrays. The fix: low + (high - low) / 2. This is not a micro-optimization. It is a correctness requirement."
+      },
+      {
+        "type": "p",
+        "text": "The design tradeoff is simple: binary search trades the ability to handle arbitrary data for logarithmic time complexity. You cannot use it on unsorted data (unless your predicate is monotonic for another reason). But when you can, it is exponentially faster than linear search."
+      },
+      {
+        "type": "h2",
+        "text": "Real World Usage"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Database indexing: B-trees use binary search within nodes to find the correct child pointer.",
+          "Debugging: git bisect uses binary search to find the commit that introduced a bug.",
+          "Machine learning: Hyperparameter tuning often uses binary search to find optimal learning rates.",
+          "Networking: Congestion control algorithms use binary search to find the optimal window size.",
+          "Every coding interview: Problems like aggressive cows, book allocation, and koko eating bananas all reduce to binary search on answer."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Complexity"
+      },
+      {
+        "type": "p",
+        "text": "Time complexity: O(log N) where N is the size of the search space. This makes it exponentially faster than linear search for large inputs. Searching a billion elements takes ~30 comparisons instead of a billion."
+      },
+      {
+        "type": "p",
+        "text": "Space complexity: O(1) for the iterative version. The recursive version uses O(log N) stack space."
+      },
+      {
+        "type": "p",
+        "text": "The real beauty: when you search on answer, N is not the input size. It is the range of possible answers. For sqrt(x), N = x. For aggressive cows, N = max(position) - min(position). This means binary search can solve problems in O(log(range)) time regardless of input size."
+      },
+      {
+        "type": "h2",
+        "text": "Common Mistakes"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Integer overflow: (low + high) / 2 breaks for large arrays. Always use low + (high - low) / 2.",
+          "Infinite loops: Using the wrong mid calculation (ceiling vs floor) for your predicate can cause infinite loops. The rule: when using low = mid, use ceiling; when using low = mid + 1, use floor.",
+          "Off-by-one errors: The most common source of bugs. Always write down the loop invariant before coding.",
+          "Confusing index search with answer search: They look similar but require different mental models.",
+          "Forgetting that high must be a valid answer: When searching for the minimum valid value, initialize high to a value that is guaranteed to satisfy the predicate."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Key Takeaway"
+      },
+      {
+        "type": "p",
+        "text": "Stop thinking of binary search as \"search in a sorted array.\" Start thinking of it as \"finding the boundary where a property flips.\" Once you internalize this, a whole class of problems becomes trivially solvable. The array is just one application. The monotonic predicate is the real abstraction."
+      },
+      {
+        "type": "p",
+        "text": "Every time you see a problem asking for the minimum of something that satisfies a condition, ask yourself: \"Is the predicate monotonic?\" If yes, binary search on answer will almost certainly work."
+      }
+    ]
+  },
+  {
+    "id": "hashmaps-magic",
+    "date": "March 2026",
+    "category": "Data Structures",
+    "categoryColor": "#7c5cfc",
+    "title": "Why HashMaps Feel Like Magic",
+    "preview": "Constant time lookups sound impossible. The trick is trading memory for time and embracing controlled chaos.",
+    "readingTime": "10 min read",
+    "topics": ["Hash Functions", "Collision Handling", "Buckets", "Load Factor", "Rehashing"],
+    "content": [
+      {
+        "type": "h2",
+        "text": "What Problem Exists?"
+      },
+      {
+        "type": "p",
+        "text": "Arrays give you O(1) access by index, but finding an element by value requires O(n) scan. Balanced trees give O(log n) search, but the constant factors and complexity are significant. What if you want O(1) average-case lookup by arbitrary key?"
+      },
+      {
+        "type": "p",
+        "text": "This is the problem HashMaps solve. They are the most widely used data structure in software engineering, and understanding their internals separates developers who copy-paste from those who engineer."
+      },
+      {
+        "type": "h2",
+        "text": "The Core Idea"
+      },
+      {
+        "type": "p",
+        "text": "A HashMap is an array of buckets, combined with a hash function that maps keys to bucket indices. When you insert a key-value pair, the hash function converts the key into an array index. When you look it up, the same hash function tells you exactly where to look."
+      },
+      {
+        "type": "p",
+        "text": "The magic is in the hash function. A good hash function distributes keys uniformly across buckets, minimizing collisions. A bad hash function puts everything in the same bucket, and your O(1) structure degrades to O(n)."
+      },
+      {
+        "type": "blockquote",
+        "text": "HashMaps do not eliminate the search problem. They make it statistically improbable that you will need to search."
+      },
+      {
+        "type": "h2",
+        "text": "How It Works"
+      },
+      {
+        "type": "p",
+        "text": "Let me walk through what happens when you call map.put(\"name\", \"Saurabh\"):"
+      },
+      {
+        "type": "ol",
+        "items": [
+          "The key \"name\" is passed to the hash function, which produces a large integer (e.g., 3373707).",
+          "This integer is compressed to fit within the bucket array size using (hash & (n-1)) or hash % n.",
+          "The resulting index points to a bucket. If the bucket is empty, the entry is placed there.",
+          "If the bucket is occupied (a collision), the HashMap uses a collision resolution strategy.",
+          "When the load factor exceeds a threshold (default 0.75), the array is resized and all entries are rehashed."
+        ]
+      },
+      {
+        "type": "h3",
+        "text": "Collision Resolution: Separate Chaining"
+      },
+      {
+        "type": "p",
+        "text": "Java 7 and earlier used linked lists for each bucket. When multiple keys hashed to the same bucket, they were stored in a linked list. Lookup required traversing the list."
+      },
+      {
+        "type": "p",
+        "text": "Java 8+ optimizes this: when a bucket's list exceeds 8 entries, the list is converted to a balanced tree (O(log n) worst-case instead of O(n)). This prevents hash collision attacks that could degrade performance."
+      },
+      {
+        "type": "h3",
+        "text": "Collision Resolution: Open Addressing"
+      },
+      {
+        "type": "p",
+        "text": "Instead of storing multiple entries per bucket, open addressing finds the next available bucket using probing (linear, quadratic, or double hashing). Used by Python's dict and Redis hashes."
+      },
+      {
+        "type": "p",
+        "text": "Linear probing: If bucket i is taken, try i+1, i+2, etc. Simple but prone to clustering. Quadratic probing: Try i+1, i+4, i+9, etc. Reduces clustering but may miss buckets."
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "text": "// Simplified put operation (Java 8 style)\nint hash = hash(key.hashCode());\nint index = hash & (table.length - 1);\n\nNode<K,V> node = table[index];\nif (node == null) {\n    table[index] = new Node<>(hash, key, value, null);\n} else {\n    // Traverse linked list or tree\n    while (true) {\n        if (node.hash == hash && Objects.equals(node.key, key)) {\n            node.value = value;  // Update existing\n            return;\n        }\n        if (node.next == null) {\n            node.next = new Node<>(hash, key, value, null);\n            return;\n        }\n        node = node.next;\n    }\n}"
+      },
+      {
+        "type": "h2",
+        "text": "Why It Was Designed This Way"
+      },
+      {
+        "type": "p",
+        "text": "The HashMap design is a masterclass in engineering tradeoffs:"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Load factor: 0.75 is the sweet spot between time and space. Lower = faster but more memory. Higher = less memory but more collisions. The number 0.75 comes from empirical research showing that with a good hash function, entries are Poisson distributed with parameter 0.5 at load factor 0.75.",
+          "Power-of-2 sizing: Using a power-of-2 array size allows hash & (n-1) instead of hash % n. The bitwise AND is significantly faster than modulo on modern CPUs.",
+          "Treeification threshold: The choice of 8 for converting lists to trees comes from the Poisson distribution. At load factor 0.75, the probability of having 8 collisions in a single bucket is 0.00000006. So trees are almost never needed, but they protect against adversarial inputs.",
+          "Immutable keys: If a key's hashCode changes after insertion, the HashMap breaks. This is why String and Integer make perfect keys — they are immutable."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Real World Usage"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Database indexing: In-memory hash indexes provide O(1) lookups for key-value patterns.",
+          "Caching: Every major caching system (Redis, Memcached) is fundamentally a distributed HashMap.",
+          "Language runtimes: JavaScript objects, Python dicts, Java HashMaps — all use hash tables.",
+          "Distributed systems: Consistent hashing maps keys to nodes in distributed caches.",
+          "Compilers: Symbol tables use hash tables for fast identifier lookup.",
+          "Network routing: Hash-based routing distributes traffic across servers."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Complexity"
+      },
+      {
+        "type": "p",
+        "text": "Average case: O(1) for get, put, and remove. The constant factor depends on hash function quality and load factor."
+      },
+      {
+        "type": "p",
+        "text": "Worst case: O(n) when all keys collide (bad hash function or hash collision attack). Java 8+ mitigates this to O(log n) with treeification."
+      },
+      {
+        "type": "p",
+        "text": "Space: O(n) for the entries plus O(capacity) for the bucket array. Typically 1.33x to 2x the number of entries."
+      },
+      {
+        "type": "h2",
+        "text": "Common Mistakes"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Using mutable keys: If you modify a key after insertion, the lookup fails because the hash changed.",
+          "Poor hash function: Using hashCode() that returns a constant causes all keys to collide.",
+          "Wrong initial capacity: Starting too small causes repeated resizing. Starting too large wastes memory.",
+          "Assuming ordering: HashMaps do not guarantee insertion order (use LinkedHashMap for that).",
+          "Concurrent modification without synchronization: HashMap is not thread-safe. Use ConcurrentHashMap.",
+          "Using == instead of equals for key comparison: HashMap uses equals() to find matching keys."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Key Takeaway"
+      },
+      {
+        "type": "p",
+        "text": "HashMaps are not magic. They are an array of buckets with a clever mapping function. The O(1) performance is amortized average-case, not worst-case. Understanding the collision resolution strategy, load factor tuning, and the properties of a good hash function is what turns a HashMap user into an engineer who knows when and how to use them."
+      }
+    ]
+  },
+  {
+    "id": "kafka-fast",
+    "date": "March 2026",
+    "category": "Distributed Systems",
+    "categoryColor": "#34d399",
+    "title": "Why Kafka Is Fast",
+    "preview": "The operating system already solved the hardest performance problems. Kafka just got out of the way.",
+    "readingTime": "9 min read",
+    "topics": ["Sequential Disk Writes", "Append-only Log", "Partitioning", "Consumer Groups"],
+    "content": [
+      {
+        "type": "h2",
+        "text": "What Problem Exists?"
+      },
+      {
+        "type": "p",
+        "text": "Traditional message queues (RabbitMQ, ActiveMQ) were built for reliable point-to-point messaging. But as companies scaled to handle millions of events per second, these systems hit fundamental bottlenecks: messages were stored as individual entities, random disk I/O dominated performance, and consumers had to acknowledge each message individually."
+      },
+      {
+        "type": "p",
+        "text": "LinkedIn faced this problem in 2010. Their existing message queue could not keep up with the volume of behavioral data, metrics, and logs generated by their growing platform. They needed something that could handle 100x the throughput with the same hardware."
+      },
+      {
+        "type": "h2",
+        "text": "The Core Idea"
+      },
+      {
+        "type": "p",
+        "text": "Kafka treats messages as entries in a commit log, not as individual queue items. This is the fundamental insight that changes everything."
+      },
+      {
+        "type": "blockquote",
+        "text": "Disk is slower than RAM only for random access. For sequential access, disk is faster than network."
+      },
+      {
+        "type": "p",
+        "text": "A modern hard drive can read 200 MB/s sequentially. A 1 Gbps network delivers 125 MB/s. Sequential disk reads are faster than network transfers. Kafka exploits this by making all I/O sequential: writes are append-only, reads are sequential scans."
+      },
+      {
+        "type": "h2",
+        "text": "How It Works"
+      },
+      {
+        "type": "h3",
+        "text": "The Append-Only Log"
+      },
+      {
+        "type": "p",
+        "text": "Every partition in Kafka is an ordered, immutable sequence of messages. New messages are always appended to the end. This is the key design decision: no random writes, no deletions (except by retention policy), no updating in place."
+      },
+      {
+        "type": "p",
+        "text": "Because writes are always sequential, the operating system can batch them efficiently. The page cache (not Kafka) handles the actual I/O. Kafka does not even call fsync on every write — it lets the OS manage when to flush pages to disk."
+      },
+      {
+        "type": "h3",
+        "text": "Zero-Copy Transfer"
+      },
+      {
+        "type": "p",
+        "text": "When a consumer reads messages, traditional systems copy data from disk to kernel buffer, then to application buffer, then to socket buffer. Kafka eliminates two of these copies using sendfile() or transferTo(): data goes directly from page cache to network socket."
+      },
+      {
+        "type": "code",
+        "language": "java",
+        "text": "// Traditional path (4 copies):\n// Disk -> Page Cache -> Application -> Socket Buffer -> Network\n\n// Kafka path (2 copies):\n// Disk -> Page Cache -> Network (via sendfile)"
+      },
+      {
+        "type": "h3",
+        "text": "Batching and Compression"
+      },
+      {
+        "type": "p",
+        "text": "Kafka batches messages at every level. Producers batch messages before sending. Brokers write batches to disk in one operation. Consumers fetch messages in batches. This amortizes the cost of network round-trips and disk operations across many messages."
+      },
+      {
+        "type": "p",
+        "text": "Messages are compressed as batches using gzip, snappy, lz4, or zstd. Compression ratios of 5x-10x are common for text data, effectively multiplying throughput."
+      },
+      {
+        "type": "h3",
+        "text": "Partitioning"
+      },
+      {
+        "type": "p",
+        "text": "A topic is divided into partitions. Each partition is stored on one broker and is the unit of parallelism. Producers distribute messages across partitions (by key or round-robin). Consumers in the same group divide partitions among themselves. This allows linear horizontal scaling: more partitions = more parallelism = more throughput."
+      },
+      {
+        "type": "h2",
+        "text": "Why It Was Designed This Way"
+      },
+      {
+        "type": "p",
+        "text": "Kafka's design is a direct response to the limitations of traditional message brokers:"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "No random I/O: Traditional queues maintain per-message state (acknowledged, delivered, etc.), requiring random reads and writes. Kafka partitions are append-only logs with a single cursor per consumer.",
+          "No in-memory reliance: Kafka is not an in-memory system. It uses disk heavily but exploits sequential access patterns. This means it can handle datasets larger than RAM without performance degradation.",
+          "Consumer-driven delivery: Traditional queues push messages and track acknowledgments. Kafka lets consumers pull messages at their own pace. This removes the complexity of broker-side state tracking.",
+          "Designed for replay: Because messages are not deleted after consumption, consumers can reprocess messages from any point in time. This enables stream reprocessing and exactly-once semantics."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Real World Usage"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "LinkedIn: Processes 7 trillion messages per day across 1,400+ brokers.",
+          "Uber: Uses Kafka for real-time trip tracking, pricing, and fraud detection.",
+          "Netflix: Kafka is the backbone of their event processing pipeline, handling 700 billion events per day.",
+          "Apache Flink and Spark: Use Kafka as the source of truth for stream processing.",
+          "Log aggregation: Kafka replaced traditional log shipping for nearly every major tech company.",
+          "Metrics and monitoring: Time-series data flows through Kafka to monitoring systems."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Complexity"
+      },
+      {
+        "type": "p",
+        "text": "Throughput: Kafka can handle millions of messages per second on modest hardware. A single partition can sustain hundreds of MB/s read and write."
+      },
+      {
+        "type": "p",
+        "text": "Latency: With proper tuning, end-to-end latency of 2-5 ms is achievable. The tradeoff: higher batching improves throughput but increases latency."
+      },
+      {
+        "type": "p",
+        "text": "Scalability: Linear with the number of partitions. Total throughput = throughput per partition * number of partitions. Partition count is bounded by the number of brokers and their resource capacity."
+      },
+      {
+        "type": "h2",
+        "text": "Common Mistakes"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Too many partitions: Each partition adds overhead (file handles, memory). The rule of thumb is 100 partitions per broker maximum.",
+          "Not tuning batch settings: Default batch.size is 16KB, which is too small for high throughput. Increasing to 64KB or 256KB significantly improves performance.",
+          "Single partition for keyed data: If all messages use the same key, they all go to one partition. No parallelism.",
+          "Ignoring acks setting: Using acks=0 is fast but can lose data. Using acks=all is safe but slower. Know your durability requirements.",
+          "Not monitoring consumer lag: High lag means consumers cannot keep up. This is not always a problem, but knowing your lag is essential for operations."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Key Takeaway"
+      },
+      {
+        "type": "p",
+        "text": "Kafka is fast because it embraces the physics of hardware instead of fighting it. Sequential disk access is faster than random access. The page cache is efficient — use it. System calls are expensive — batch everything. Network is the bottleneck — eliminate unnecessary copies. The architecture that emerged from these principles is not just fast; it is also simple, durable, and scalable."
+      }
+    ]
+  },
+  {
+    "id": "btrees-databases",
+    "date": "April 2026",
+    "category": "Databases",
+    "categoryColor": "#f59e0b",
+    "title": "Why B-Trees Power Databases",
+    "preview": "Binary search trees work in memory. But databases live on disk. The difference is 10,000x latency.",
+    "readingTime": "10 min read",
+    "topics": ["Disk Access", "Indexing", "MySQL", "Page Structure"],
+    "content": [
+      {
+        "type": "h2",
+        "text": "What Problem Exists?"
+      },
+      {
+        "type": "p",
+        "text": "Databases store data on disk. A single disk seek takes about 10 milliseconds. In that time, a modern CPU can execute 40 million instructions. The cost of reading from disk is so high that the number of disk seeks dominates query performance, not CPU time."
+      },
+      {
+        "type": "p",
+        "text": "A balanced binary search tree requires O(log n) lookups. With 1 million records, that is 20 comparisons. In memory, 20 comparisons take microseconds. On disk, 20 random seeks take 200 milliseconds — unacceptable for any real-time application."
+      },
+      {
+        "type": "blockquote",
+        "text": "The B-Tree is not a binary search tree. It is a binary search tree that learned to respect the physics of spinning platters."
+      },
+      {
+        "type": "h2",
+        "text": "The Core Idea"
+      },
+      {
+        "type": "p",
+        "text": "A B-Tree reduces the number of disk seeks by making each node hold thousands of keys instead of just one. A node in a B-Tree corresponds to a disk page (typically 4KB or 16KB). By reading one page, the database gets enough information to navigate to the next level."
+      },
+      {
+        "type": "p",
+        "text": "With a branching factor of 500 (typical for a B+Tree), a 4-level tree can index 500^4 = 62.5 billion records. That is 4 disk seeks to find any record in a 62 billion row table."
+      },
+      {
+        "type": "h2",
+        "text": "How It Works"
+      },
+      {
+        "type": "h3",
+        "text": "B-Tree Structure"
+      },
+      {
+        "type": "p",
+        "text": "Every node in a B-Tree contains between t-1 and 2t-1 keys (where t is the minimum degree). The node also contains pointers to child nodes for each key range. All leaves are at the same depth."
+      },
+      {
+        "type": "p",
+        "text": "The structure is self-balancing: splits happen when a node becomes full, merges happen when a node becomes too empty. This guarantees the tree stays balanced without requiring periodic rebalancing passes."
+      },
+      {
+        "type": "h3",
+        "text": "B+Tree: The Database Standard"
+      },
+      {
+        "type": "p",
+        "text": "MySQL InnoDB, PostgreSQL, and most relational databases use B+Trees, not B-Trees. The difference: B+Trees store all data in leaf nodes, and internal nodes only contain keys (routers). Leaves are linked together in a linked list, enabling efficient range scans."
+      },
+      {
+        "type": "code",
+        "language": "text",
+        "text": "B+Tree Internal Node:    [key1, key2, key3, ...]\n                          /    |     \\    \\\n                       ptr1  ptr2   ptr3  ptr4\n\nB+Tree Leaf Node:       [key1, data1, key2, data2, ...] -> next leaf"
+      },
+      {
+        "type": "h3",
+        "text": "Insertion Strategy"
+      },
+      {
+        "type": "p",
+        "text": "When a leaf node is full, it splits into two nodes, and the median key moves up to the parent. This may cascade up the tree. The key insight: splits are local operations. Unlike rebalancing in red-black trees, B-Tree splits affect only the nodes on the path from root to leaf."
+      },
+      {
+        "type": "h2",
+        "text": "Why It Was Designed This Way"
+      },
+      {
+        "type": "p",
+        "text": "The B-Tree was invented in 1970 by Rudolf Bayer and Edward McCreight at Boeing. The \"B\" does not officially stand for anything, but the common interpretation is \"Boeing\" or \"balanced.\""
+      },
+      {
+        "type": "p",
+        "text": "The design is optimized for the physical characteristics of disk storage:"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Page-aligned nodes: A node fits exactly in one disk page. Reading one node = one I/O operation.",
+          "High branching factor: Minimizes tree height. Height 4 is enough for billions of records.",
+          "Self-balancing: No periodic maintenance needed. The tree stays balanced through normal operations.",
+          "Locality: Related data is stored in the same block. Range scans are sequential reads.",
+          "Caching: Frequently accessed internal nodes stay in the buffer pool, reducing I/O."
+        ]
+      },
+      {
+        "type": "p",
+        "text": "Compare with alternatives: Binary search trees require 2x more disk seeks. Hash indexes cannot do range queries. Skip lists have O(log n) expected but no guarantee of locality. The B-Tree family strikes the optimal balance for general-purpose database indexing."
+      },
+      {
+        "type": "h2",
+        "text": "Real World Usage"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "MySQL InnoDB: The primary key index is a B+Tree. Secondary indexes are also B+Trees that point to the primary key.",
+          "PostgreSQL: Uses B+Trees (called B-Trees in docs) for default indexing.",
+          "MongoDB: Uses B-Trees for its default index type (WiredTiger storage engine).",
+          "SQLite: Uses B+Trees for table storage and indexes.",
+          "Oracle: B-Tree indexes are the default index type.",
+          "File systems: NTFS, HFS+, and Ext4 all use B-Tree variants for directory indexing."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Complexity"
+      },
+      {
+        "type": "p",
+        "text": "Time complexity: O(log n) for search, insert, and delete. But the real measure is disk seeks: tree height determines I/O cost. With a typical page size of 16KB and keys of 8 bytes, the branching factor is ~1000, giving height log_1000(n)."
+      },
+      {
+        "type": "p",
+        "text": "Space complexity: O(n). Nodes are kept between half and full occupancy, so space utilization is 50-100%. Random inserts tend toward 69% utilization on average."
+      },
+      {
+        "type": "h2",
+        "text": "Common Mistakes"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Using UUID as primary key: Random UUIDs cause scattered inserts, page splits, and index fragmentation. Auto-increment integers are far better for B+Tree performance.",
+          "Ignoring composite index order: A B+Tree index on (a, b) is not the same as (b, a). The leftmost prefix rule determines whether the index can be used.",
+          "Not monitoring page fill factor: Low fill factor wastes space and increases tree height. High fill factor causes excessive page splits on inserts.",
+          "Creating too many indexes: Each index is a separate B+Tree. Writes must update every index, slowing down inserts and updates.",
+          "Assuming small indexes are free: Even a small B-Tree has overhead. Evaluate whether the query pattern justifies the index."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Key Takeaway"
+      },
+      {
+        "type": "p",
+        "text": "The B-Tree exists because hardware has a memory hierarchy, and each level is orders of magnitude slower than the one above it. The B-Tree does not minimize comparisons (like binary search trees) or total operations. It minimizes disk seeks. Understanding this changes how you design schemas, choose primary keys, and write queries. The data structure is a reflection of the hardware it runs on."
+      }
+    ]
+  },
+  {
+    "id": "tcp-reliability",
+    "date": "April 2026",
+    "category": "Computer Networks",
+    "categoryColor": "#00d4ff",
+    "title": "How TCP Actually Guarantees Reliability",
+    "preview": "The internet is a collection of unreliable packets. TCP builds trust on top of chaos using decades-old techniques that still work at planetary scale.",
+    "readingTime": "11 min read",
+    "topics": ["ACK", "Retransmission", "Sliding Window", "Flow Control"],
+    "content": [
+      {
+        "type": "h2",
+        "text": "What Problem Exists?"
+      },
+      {
+        "type": "p",
+        "text": "IP (Internet Protocol) makes a single guarantee: best-effort delivery. Packets can be lost, duplicated, reordered, or delayed. There is no guarantee that data sent from point A will ever arrive at point B, let alone in the right order."
+      },
+      {
+        "type": "p",
+        "text": "Yet we use the internet for video calls, bank transfers, SSH sessions, and database queries — applications that require reliable, ordered delivery of data. TCP is the layer that turns an unreliable packet network into a reliable stream."
+      },
+      {
+        "type": "blockquote",
+        "text": "TCP does not make the network reliable. It makes the connection reliable despite the network."
+      },
+      {
+        "type": "h2",
+        "text": "The Core Idea"
+      },
+      {
+        "type": "p",
+        "text": "TCP creates the illusion of a reliable connection over an unreliable network using four mechanisms: positive acknowledgment (ACK), retransmission on timeout, sequence numbering, and checksums."
+      },
+      {
+        "type": "p",
+        "text": "The fundamental insight is simple: every byte sent must be explicitly acknowledged by the receiver. If the sender does not receive an ACK within a timeout, it retransmits the data. The receiver uses sequence numbers to reassemble data in the correct order and discard duplicates."
+      },
+      {
+        "type": "h2",
+        "text": "How It Works"
+      },
+      {
+        "type": "h3",
+        "text": "Sequence Numbers and ACKs"
+      },
+      {
+        "type": "p",
+        "text": "Every byte of data in a TCP connection has a sequence number. The sender includes the sequence number of the first byte in each segment. The receiver sends back an ACK with the next expected sequence number (cumulative acknowledgment)."
+      },
+      {
+        "type": "p",
+        "text": "For example: sender sends bytes 1-1000. The receiver ACKs 1001 (meaning \"I received everything up to byte 1000\"). If the sender does not receive this ACK, it retransmits bytes 1-1000."
+      },
+      {
+        "type": "h3",
+        "text": "Retransmission Timeout (RTO)"
+      },
+      {
+        "type": "p",
+        "text": "The timeout must be adaptive. A fixed timeout that works for a local network would be too short for a transatlantic connection. Too short = spurious retransmissions. Too long = poor performance."
+      },
+      {
+        "type": "p",
+        "text": "TCP continuously measures the round-trip time (RTT) of each connection and adjusts the timeout dynamically using Jacobson's algorithm:"
+      },
+      {
+        "type": "code",
+        "language": "text",
+        "text": "EstimatedRTT = 0.875 * EstimatedRTT + 0.125 * SampleRTT\nDevRTT = 0.75 * DevRTT + 0.25 * |SampleRTT - EstimatedRTT|\nRTO = EstimatedRTT + 4 * DevRTT"
+      },
+      {
+        "type": "h3",
+        "text": "Fast Retransmit"
+      },
+      {
+        "type": "p",
+        "text": "Waiting for a timeout is slow (typically 200ms to several seconds). TCP uses duplicate ACKs to detect loss faster. When the receiver gets an out-of-order segment, it sends an ACK for the last correctly received byte. If the sender receives 3 duplicate ACKs, it retransmits the missing segment immediately without waiting for the timeout."
+      },
+      {
+        "type": "h3",
+        "text": "Sliding Window"
+      },
+      {
+        "type": "p",
+        "text": "Sending one segment and waiting for an ACK before sending the next would be absurdly slow (one round-trip per segment). The sliding window allows the sender to transmit multiple segments before waiting for ACKs."
+      },
+      {
+        "type": "p",
+        "text": "The sender's window is the minimum of two values: the receiver's advertised window (flow control) and the congestion window (congestion control). The sender can transmit up to this many unacknowledged bytes at any time."
+      },
+      {
+        "type": "code",
+        "language": "text",
+        "text": "// Sliding window state\nwindow = min(cwnd, rwnd)\nif (nextByteToSend - lastByteAcked < window) {\n    send(nextByteToSend)\n} else {\n    wait  // window full\n}"
+      },
+      {
+        "type": "h3",
+        "text": "Flow Control"
+      },
+      {
+        "type": "p",
+        "text": "The receiver advertises a window size (rwnd) based on available buffer space. If the receiver is slow and the sender is fast, the buffer fills up, and the receiver advertises a smaller window. TCP is self-clocking: data flow is paced by ACKs returning from the receiver."
+      },
+      {
+        "type": "h3",
+        "text": "Congestion Control"
+      },
+      {
+        "type": "p",
+        "text": "TCP uses multiple algorithms to avoid congesting the network:"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Slow Start: Begins with cwnd = 1 segment and doubles every RTT until a loss is detected or the slow start threshold is reached.",
+          "Congestion Avoidance: After slow start, cwnd increases by 1 segment per RTT (additive increase).",
+          "Fast Recovery: On triple duplicate ACK, cwnd is halved and slow start is skipped.",
+          "AIMD (Additive Increase Multiplicative Decrease): The core principle that keeps the internet stable."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Why It Was Designed This Way"
+      },
+      {
+        "type": "p",
+        "text": "TCP was designed in the 1970s by Vint Cerf and Bob Kahn for the ARPANET. The design constraints were very different from today: networks were slow, memory was expensive, and the protocol had to work across wildly different link types."
+      },
+      {
+        "type": "p",
+        "text": "The decision to use cumulative ACKs (rather than selective ACKs) was a practical one: each ACK carries a single 32-bit sequence number, keeping the header small. Selective ACK (SACK) was added later as an option when high-bandwidth links exposed the limitations of cumulative ACKs."
+      },
+      {
+        "type": "p",
+        "text": "The end-to-end principle is deeply embedded in TCP: reliability is implemented at the endpoints, not in the network. Routers are deliberately simple (they do not track connections). This simplicity is what allowed the internet to scale from a few dozen nodes to billions."
+      },
+      {
+        "type": "h2",
+        "text": "Real World Usage"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "HTTP/1.1 and HTTP/2: Both run over TCP. Every website you visit uses TCP.",
+          "SSH, FTP, SMTP, IMAP: All rely on TCP for reliable data transfer.",
+          "Database connections: PostgreSQL, MySQL, and nearly all databases use TCP.",
+          "Video streaming: Netflix and YouTube use TCP (not UDP) for video delivery because they need reliability more than low latency.",
+          "Kafka: Uses TCP for all communication between producers, brokers, and consumers."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Complexity"
+      },
+      {
+        "type": "p",
+        "text": "Overhead: TCP headers are 20-60 bytes. For small messages, this overhead is significant. For bulk transfers, it is negligible."
+      },
+      {
+        "type": "p",
+        "text": "Throughput is bounded by: Throughput <= WindowSize / RTT. With a 64KB window and 100ms RTT, max throughput is ~5 Mbps. This is why TCP window scaling (RFC 7323) is essential for high-bandwidth links."
+      },
+      {
+        "type": "p",
+        "text": "Latency: TCP adds at least one RTT for the three-way handshake before data can be sent. TLS adds another RTT or two. This is why connection reuse and HTTP/2 multiplexing matter."
+      },
+      {
+        "type": "h2",
+        "text": "Common Mistakes"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Assuming TCP is always reliable: TCP guarantees delivery only if the connection remains established. If the connection drops, in-flight data is lost.",
+          "Not understanding Nagle's algorithm: Small writes are buffered to improve efficiency, but this can cause unexpected delays in interactive applications. TCP_NODELAY disables this.",
+          "Ignoring the TIME_WAIT state: A socket in TIME_WAIT (2 * MSL = ~60 seconds) cannot be reused. High connection rates can exhaust port ranges.",
+          "Assuming ordering is guaranteed within a connection: It is. But between connections to the same host, ordering is not guaranteed.",
+          "Tuning only send buffer: The receive buffer (SO_RCVBUF) limits the window advertised by the receiver, which limits the sender's throughput."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Key Takeaway"
+      },
+      {
+        "type": "p",
+        "text": "TCP is a masterclass in building reliability on top of unreliable primitives. The combination of cumulative ACKs, adaptive timeouts, sliding windows, and congestion control creates a protocol that is provably correct, remarkably efficient, and scalable to planetary dimensions. Understanding TCP's design principles — end-to-end reliability, self-clocking behavior, and adaptive parameter estimation — is essential for any engineer building distributed systems."
+      }
+    ]
+  },
+  {
+    "id": "react-reconciliation",
+    "date": "April 2026",
+    "category": "React",
+    "categoryColor": "#00d4ff",
+    "title": "How React Reconciliation Works",
+    "preview": "I used React for years before asking: how does it know what to update? The answer is smarter than I expected.",
+    "readingTime": "10 min read",
+    "topics": ["Virtual DOM", "Diffing", "Rendering", "Fiber Architecture"],
+    "content": [
+      {
+        "type": "h2",
+        "text": "What Problem Exists?"
+      },
+      {
+        "type": "p",
+        "text": "Updating the DOM is slow. Every time you change a DOM element's attribute, insert a node, or remove an element, the browser must recalculate styles, reflow the layout, and repaint the screen. These operations are expensive."
+      },
+      {
+        "type": "p",
+        "text": "Before React, developers directly manipulated the DOM. The result was spaghetti code where state was scattered across DOM elements, event handlers, and global variables. Keeping the UI in sync with application state was the hardest part of frontend development."
+      },
+      {
+        "type": "p",
+        "text": "jQuery made DOM manipulation easier, but it did not solve the fundamental problem: imperative DOM updates are error-prone and hard to reason about."
+      },
+      {
+        "type": "h2",
+        "text": "The Core Idea"
+      },
+      {
+        "type": "p",
+        "text": "React decouples what the UI should look like (declarative) from how to update it (imperative). You describe the desired state, and React figures out the minimal set of DOM operations to get there."
+      },
+      {
+        "type": "blockquote",
+        "text": "React does not know what changed. It diffs the entire Virtual DOM against the previous version and computes the minimum operations needed."
+      },
+      {
+        "type": "p",
+        "text": "The Virtual DOM is a lightweight JavaScript object representation of the real DOM. It is faster to create and diff because it does not trigger layout or paint operations. React determines what changed in the Virtual DOM, then applies only those changes to the real DOM."
+      },
+      {
+        "type": "h2",
+        "text": "How It Works"
+      },
+      {
+        "type": "h3",
+        "text": "The Render Phase"
+      },
+      {
+        "type": "p",
+        "text": "When state changes (via setState or useState setter), React marks the component as needing re-render. It then builds a new Virtual DOM tree by calling the component's render function and all child render functions."
+      },
+      {
+        "type": "p",
+        "text": "This is the reconciliation algorithm: comparing the previous Virtual DOM tree with the new one and producing a list of changes (called effects) that need to be applied to the real DOM."
+      },
+      {
+        "type": "h3",
+        "text": "The Diffing Algorithm"
+      },
+      {
+        "type": "p",
+        "text": "Comparing two trees efficiently is O(n) in React, not O(n^3) as the general tree diffing problem would suggest. React achieves this with two key assumptions:"
+      },
+      {
+        "type": "ol",
+        "items": [
+          "Elements of different types produce different trees. If a <div> becomes a <span>, React destroys the old tree and builds a new one.",
+          "Developers can use the key prop to hint at element identity. Elements with the same key across renders are assumed to be the same element."
+        ]
+      },
+      {
+        "type": "p",
+        "text": "These assumptions are not always correct (which is why you should use stable keys), but they hold for the vast majority of cases and make the algorithm practical."
+      },
+      {
+        "type": "h3",
+        "text": "The Commit Phase"
+      },
+      {
+        "type": "p",
+        "text": "After the render phase produces a list of effects, React enters the commit phase where changes are applied to the real DOM. This phase is synchronous and cannot be interrupted. React processes the effects as a batch to minimize browser layout thrashing."
+      },
+      {
+        "type": "code",
+        "language": "jsx",
+        "text": "// When this component renders:\nfunction ItemList({ items }) {\n  return (\n    <ul>\n      {items.map(i => <li key={i.id}>{i.name}</li>)}\n    </ul>\n  );\n}\n\n// React reconciles by checking:\n// 1. Same element type (ul)? Yes, update existing.\n// 2. Same children with matching keys? Yes, reuse DOM nodes.\n// 3. Only changed text content? Update textContent, no DOM rebuild."
+      },
+      {
+        "type": "h3",
+        "text": "Fiber Architecture (React 16+)"
+      },
+      {
+        "type": "p",
+        "text": "Before Fiber, reconciliation was recursive and synchronous. A deep component tree would block the main thread for hundreds of milliseconds, causing visible jank."
+      },
+      {
+        "type": "p",
+        "text": "Fiber reimplemented the render phase as a linked list traversal that can be paused and resumed. Each component becomes a \"fiber node\" with pointers to its child, sibling, and return (parent). This enables:"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Incremental rendering: Work can be split into chunks and spread across multiple frames.",
+          "Priority-based scheduling: Urgent updates (user input) are processed before less urgent ones (data fetching).",
+          "Concurrent mode: React can prepare new trees in memory while the current one is still displayed."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Why It Was Designed This Way"
+      },
+      {
+        "type": "p",
+        "text": "React's design is a direct response to the limitations of MVC frameworks in 2013. AngularJS used dirty checking (digest cycles that compared all models) and had unpredictable performance. Ember used a run loop with computed properties that required careful ordering."
+      },
+      {
+        "type": "p",
+        "text": "React's bet was simple: instead of tracking dependencies between state and UI (which is hard to get right), just re-render the entire component tree every time state changes. The Virtual DOM makes this fast enough."
+      },
+      {
+        "type": "p",
+        "text": "The tradeoff is clear: React trades memory (storing two Virtual DOM trees) for developer productivity (not needing to write imperative DOM updates). For most applications, this tradeoff is overwhelmingly positive."
+      },
+      {
+        "type": "h2",
+        "text": "Real World Usage"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Facebook.com: The entire UI is built with React. Reconciliation handles millions of state updates per second during peak usage.",
+          "VS Code: Built with Electron and React-like patterns for the UI.",
+          "Discord, WhatsApp Web, Twitter: All use React for their complex, state-heavy UIs.",
+          "Every React app benefits from reconciliation automatically. Developers do not need to optimize unless they hit specific performance bottlenecks."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Complexity"
+      },
+      {
+        "type": "p",
+        "text": "Time complexity: O(n) for the diff itself (with the key + type assumptions). O(n) for the commit phase. Total: O(n) where n is the number of components rendered during this update."
+      },
+      {
+        "type": "p",
+        "text": "Memory: Each fiber node is a JavaScript object with multiple fields. A tree of 10,000 components uses ~500KB of fiber nodes (varies by implementation)."
+      },
+      {
+        "type": "p",
+        "text": "Scheduling: Fiber's priority system ensures 60 FPS rendering by deferring low-priority work. React can yield to the browser every ~5ms of work."
+      },
+      {
+        "type": "h2",
+        "text": "Common Mistakes"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Using array index as key: Index-based keys cause React to incorrectly reuse DOM nodes when the list order changes. Use stable, unique IDs.",
+          "Mutating state directly: React cannot detect changes to mutated objects. Always create new objects (use spread or immutable patterns).",
+          "Putting too much state in a single component: Deep trees re-render more than necessary. Lift state up or use context selectively.",
+          "Not using React.memo or useMemo: Pure components prevent unnecessary re-renders. Memoize expensive computations.",
+          "Calling setState in useEffect without dependencies: This creates infinite render loops."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Key Takeaway"
+      },
+      {
+        "type": "p",
+        "text": "Reconciliation is why React is declarative. You tell React what you want, not how to do it. Understanding the type-checking heuristic, the importance of keys, and the Fiber architecture helps you write performant React without fighting the framework. The next time a component re-renders unexpectedly, you now know exactly where to look: incorrect key usage or unnecessary state updates in parent components."
+      }
+    ]
+  },
+  {
+    "id": "os-scheduling",
+    "date": "April 2026",
+    "category": "Operating Systems",
+    "categoryColor": "#7c5cfc",
+    "title": "Why Operating Systems Need Scheduling",
+    "preview": "A CPU can only run one process at a time. Scheduling is the art of making every user feel like they own the machine.",
+    "readingTime": "9 min read",
+    "topics": ["Context Switching", "CPU Utilization", "Round Robin", "Priority Scheduling"],
+    "content": [
+      {
+        "type": "h2",
+        "text": "What Problem Exists?"
+      },
+      {
+        "type": "p",
+        "text": "A typical CPU has one or a few cores. But you can have dozens of applications open: a browser with 50 tabs, a code editor, Spotify, Slack, Docker containers, and background processes. Each of these is one or more processes (or threads), all competing for CPU time."
+      },
+      {
+        "type": "p",
+        "text": "Without a scheduler, one process could run forever and starve every other process. The operating system must multiplex CPU time among all runnable processes, ensuring fairness, low latency for interactive tasks, and high throughput for batch work."
+      },
+      {
+        "type": "blockquote",
+        "text": "A scheduler turns one CPU into the illusion of many."
+      },
+      {
+        "type": "h2",
+        "text": "The Core Idea"
+      },
+      {
+        "type": "p",
+        "text": "The scheduler decides which process runs next. Each decision involves a tradeoff between conflicting goals: throughput vs. fairness, latency vs. utilization, responsiveness vs. efficiency."
+      },
+      {
+        "type": "p",
+        "text": "No single scheduling algorithm is optimal for all workloads. This is why modern operating systems use hybrid approaches (like Linux's Completely Fair Scheduler or O(1) Scheduler) that combine multiple strategies."
+      },
+      {
+        "type": "h2",
+        "text": "How It Works"
+      },
+      {
+        "type": "h3",
+        "text": "The Context Switch"
+      },
+      {
+        "type": "p",
+        "text": "When the scheduler decides to switch from process A to process B, it performs a context switch: the CPU state (registers, program counter, stack pointer) is saved to A's PCB (Process Control Block), and B's saved state is restored. This is pure overhead — no useful work is done during a context switch."
+      },
+      {
+        "type": "p",
+        "text": "A single context switch takes 1-5 microseconds on modern hardware. With 1000 context switches per second, that is 1-5 milliseconds of overhead per second — acceptable. But 100,000 context switches per second would waste 50% of CPU time."
+      },
+      {
+        "type": "h3",
+        "text": "First-Come, First-Served (FCFS)"
+      },
+      {
+        "type": "p",
+        "text": "The simplest scheduler: process runs until it either finishes or blocks (waits for I/O). FCFS is fair in ordering but terrible for interactive workloads — a long CPU-bound process can starve all other processes for seconds."
+      },
+      {
+        "type": "h3",
+        "text": "Round Robin (RR)"
+      },
+      {
+        "type": "p",
+        "text": "Each process gets a fixed time slice (quantum), typically 10-100ms. When the quantum expires, the process is preempted and moved to the back of the ready queue. Round Robin provides fairness and low response time."
+      },
+      {
+        "type": "p",
+        "text": "The quantum is critical: too small causes excessive context switching overhead, too large loses responsiveness. Linux's default is 100ms on desktop, 10ms on real-time configs."
+      },
+      {
+        "type": "h3",
+        "text": "Priority Scheduling"
+      },
+      {
+        "type": "p",
+        "text": "Not all processes are equal. The audio daemon needs immediate CPU time when playing sound. A background log rotator can wait. Priority scheduling assigns each process a priority level. Higher priority processes run before lower ones."
+      },
+      {
+        "type": "p",
+        "text": "The problem with pure priority scheduling is starvation: low-priority processes may never run if high-priority processes keep arriving. Linux solves this with dynamic priority aging: a process's priority increases the longer it waits."
+      },
+      {
+        "type": "h3",
+        "text": "Completely Fair Scheduler (CFS)"
+      },
+      {
+        "type": "p",
+        "text": "Linux's CFS (since kernel 2.6.23) models the ideal multitasking CPU: one that can run all processes simultaneously, each at 1/n speed. In reality, the CFS maintains a virtual runtime (vruntime) for each process — the amount of time the process has run, weighted by priority."
+      },
+      {
+        "type": "p",
+        "text": "The process with the smallest vruntime is always selected. CFS uses a red-black tree to find this in O(log n) time. The result is near-perfect fairness: every process gets exactly its fair share of CPU time over any reasonable window."
+      },
+      {
+        "type": "code",
+        "language": "text",
+        "text": "// Simplified CFS decision\n// Pick the process with the smallest vruntime\nnext = rb_tree_min(&cfs_rq->tasks_timeline)\n\n// Update vruntime when process runs\ncurrent->vruntime += runtime * (NICE_0_LOAD / current->load.weight)\n\n// If current's vruntime exceeds next smallest, reschedule"
+      },
+      {
+        "type": "h2",
+        "text": "Why It Was Designed This Way"
+      },
+      {
+        "type": "p",
+        "text": "Schedulers evolved as hardware and workloads changed:"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Batch systems (1960s): Simple FCFS was fine because jobs were long-running and user interaction was minimal.",
+          "Interactive systems (1970s, Unix): Round Robin and priority scheduling became necessary. Users expected immediate response to keystrokes.",
+          "Desktop systems (1990s): Multimedia workloads required scheduling that could guarantee CPU time for audio/video. Linux introduced the O(1) scheduler in kernel 2.5.",
+          "Modern systems (2010s+): CFS balances fairness with interactive responsiveness. The BFQ scheduler adds disk I/O fairness. The scheduler is now a subsystem, not a single algorithm."
+        ]
+      },
+      {
+        "type": "p",
+        "text": "Every scheduling decision is a tradeoff:"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Throughput vs. response time: Large quantums maximize throughput but harm interactivity.",
+          "Fairness vs. throughput: Perfect fairness requires frequent context switches, reducing throughput.",
+          "Starvation vs. complexity: Preventing starvation adds algorithmic complexity.",
+          "Predictability vs. utilization: Real-time guarantees require reserving CPU that might go unused."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Real World Usage"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Linux desktop: CFS with interactive granularity. A typing-heavy workload gets near-instant CPU access.",
+          "Linux server: CFS with server tuning. Background tasks are deprioritized in favor of serving requests.",
+          "Android: CFS with cgroups (control groups) to manage foreground vs. background app CPU shares.",
+          "Kubernetes: Uses Linux cgroups and CFS quotas to implement pod CPU limits.",
+          "Real-time systems (QNX, VxWorks): Use priority-based preemptive scheduling with guaranteed latency bounds.",
+          "Docker: CPU shares and limits are enforced through the CFS scheduler (CFS quota and period)."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Complexity"
+      },
+      {
+        "type": "p",
+        "text": "Time complexity: CFS selects the next process in O(log n) using a red-black tree. Context switch cost is O(1) (register save/restore)."
+      },
+      {
+        "type": "p",
+        "text": "Memory: Each process has a PCB (~1-2KB) in kernel memory. The scheduler itself uses minimal additional memory (red-black tree nodes are embedded in the task struct)."
+      },
+      {
+        "type": "p",
+        "text": "Scale: Linux can handle hundreds of thousands of processes efficiently. The scheduler overhead is negligible up to about 10,000 runnable processes."
+      },
+      {
+        "type": "h2",
+        "text": "Common Mistakes"
+      },
+      {
+        "type": "ul",
+        "items": [
+          "Confusing concurrency with parallelism: Scheduling provides concurrency (many processes making progress), not necessarily parallelism (running simultaneously on multiple cores).",
+          "Assuming all processes need CPU: A process waiting for I/O is not using CPU time. The scheduler can run other processes while I/O completes.",
+          "Over-subscribing CPU: Running 1000 threads on 4 cores causes context switching overhead. Use thread pools to limit active threads.",
+          "Ignoring priority inversion: A low-priority process holding a lock that a high-priority process needs causes priority inversion. Modern schedulers use priority inheritance to mitigate this.",
+          "Not considering NUMA: On multi-socket systems, accessing memory on a remote socket is slower. Linux's NUMA scheduler tries to keep processes on the same socket as their memory."
+        ]
+      },
+      {
+        "type": "h2",
+        "text": "Key Takeaway"
+      },
+      {
+        "type": "p",
+        "text": "CPU scheduling is the operating system's most visible policy decision. It determines whether your system feels snappy or sluggish, whether background jobs complete efficiently, and whether the system is fair to all processes. Understanding scheduling algorithms — especially CFS's vruntime approach — helps you reason about system performance, tune application behavior, and design concurrent systems that play well with the OS."
+      }
+    ]
+  }
+]
