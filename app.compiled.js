@@ -1034,6 +1034,17 @@ function TerminalSection() {
 
 /* ─── Contact ─── */
 
+/* ─── EmailJS setup ───
+ * 1. Sign up at https://emailjs.com (free — 200 emails/month)
+ * 2. Go to Email Services → connect Gmail/Outlook
+ * 3. Go to Email Templates → create a template with: from_name, from_email, message
+ * 4. Copy your Public Key, Service ID, and Template ID below
+ */
+const EMAILJS_PUBLIC_KEY = "YOUR_PUBLIC_KEY";
+const EMAILJS_SERVICE_ID = "YOUR_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_TEMPLATE_ID";
+/* ───────────────────────────────────── */
+
 function ContactSection() {
   const [form, setForm] = useState({
     name: "",
@@ -1048,16 +1059,25 @@ function ContactSection() {
     setStatus("sending");
     setFeedback("");
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify(form)
+        body: JSON.stringify({
+          service_id: EMAILJS_SERVICE_ID,
+          template_id: EMAILJS_TEMPLATE_ID,
+          user_id: EMAILJS_PUBLIC_KEY,
+          template_params: {
+            from_name: form.name,
+            from_email: form.email,
+            message: form.message
+          }
+        })
       });
-      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || "Unable to send message right now.");
+        const text = await response.text().catch(() => "");
+        throw new Error(text || "Failed to send message.");
       }
       setStatus("sent");
       setFeedback("Your message was sent successfully.");
@@ -1068,7 +1088,7 @@ function ContactSection() {
       });
     } catch (error) {
       setStatus("error");
-      setFeedback(error.message || "Something went wrong while sending your message.");
+      setFeedback(error.message || "Something went wrong.");
     }
   };
   return /*#__PURE__*/React.createElement(Section, {
