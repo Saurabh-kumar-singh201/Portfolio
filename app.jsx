@@ -1020,17 +1020,14 @@ function TerminalSection() {
 /* ─── Contact ─── */
 
 /* ─── EmailJS setup ───
- * 1. Sign up at https://emailjs.com (free — 200 emails/month)
- * 2. Go to Email Services → connect Gmail/Outlook
- * 3. Go to Email Templates → create a template with: from_name, from_email, message
- * 4. Copy your Public Key, Service ID, and Template ID below
+ * Replace these with the IDs from https://dashboard.emailjs.com/admin
+ * Template variables expected by this form: from_name, from_email, message
  */
 const EMAILJS_PUBLIC_KEY = "A7-F_iISlemaGJLp8";
 const EMAILJS_SERVICE_ID = "service_64zuwru";
-const EMAILJS_TEMPLATE_ID = "template_ghk7tit";
-/* ───────────────────────────────────── */
+const EMAILJS_TEMPLATE_ID = "template_4e87wtk";
 
-function ContactSection() {
+function ContactSection() { 
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [status, setStatus] = useState("idle");
   const [feedback, setFeedback] = useState("");
@@ -1043,32 +1040,23 @@ function ContactSection() {
     setFeedback("");
 
     try {
-      const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          service_id: EMAILJS_SERVICE_ID,
-          template_id: EMAILJS_TEMPLATE_ID,
-          user_id: EMAILJS_PUBLIC_KEY,
-          template_params: {
-            from_name: form.name,
-            from_email: form.email,
-            message: form.message,
-          },
-        }),
-      });
-
-      if (!response.ok) {
-        const text = await response.text().catch(() => "");
-        throw new Error(text || "Failed to send message.");
-      }
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          message: form.message,
+        },
+        EMAILJS_PUBLIC_KEY,
+      );
 
       setStatus("sent");
       setFeedback("Your message was sent successfully.");
       setForm({ name: "", email: "", message: "" });
     } catch (error) {
       setStatus("error");
-      setFeedback(error.message || "Something went wrong.");
+      setFeedback(error?.text || error?.message || "Something went wrong.");
     }
   };
 
