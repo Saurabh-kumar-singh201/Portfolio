@@ -1040,7 +1040,7 @@ function TerminalSection() {
  */
 const EMAILJS_PUBLIC_KEY = "A7-F_iISlemaGJLp8";
 const EMAILJS_SERVICE_ID = "service_64zuwru";
-const EMAILJS_TEMPLATE_ID = "template_5y7erpm";
+const EMAILJS_TEMPLATE_ID = "template_4e87wtk";
 function ContactSection() {
   const [form, setForm] = useState({
     name: "",
