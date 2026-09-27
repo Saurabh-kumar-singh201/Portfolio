@@ -2,6 +2,8 @@ const { useEffect, useState, useRef, useCallback, useMemo } = React;
 
 /* ─── Data ─── */
 
+const RESUME_PATH = "/Saurabh_Kumar_Singh_Resume.pdf";
+
 const roles = [
   "Full Stack Developer",
   "Problem Solver",
@@ -571,13 +573,13 @@ function Hero() {
             <span className="text-muted">$</span> view_projects
           </a>
           <a
-            href="Resume.pdf"
+            href={RESUME_PATH}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-lg border border-[rgba(255,255,255,0.08)] bg-white/[0.03] px-5 py-2.5 font-mono text-sm font-medium text-muted transition-all hover:border-[rgba(255,255,255,0.15)] hover:bg-white/[0.06] hover:text-ink"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-            resume.pdf
+            resume
           </a>
         </div>
 
@@ -926,7 +928,7 @@ function TerminalSection() {
     }
 
     if (trimmed === "resume") {
-      window.open("Resume.pdf", "_blank");
+      window.open(RESUME_PATH, "_blank", "noopener,noreferrer");
     }
 
     const cmdData = terminalCommands[trimmed];

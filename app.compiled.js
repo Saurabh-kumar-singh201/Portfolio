@@ -9,6 +9,7 @@ const {
 
 /* ─── Data ─── */
 
+const RESUME_PATH = "/Saurabh_Kumar_Singh_Resume.pdf";
 const roles = ["Full Stack Developer", "Problem Solver", "Backend Engineer", "CSE Student"];
 const projects = [{
   id: "cryuze",
@@ -543,7 +544,7 @@ function Hero() {
   }, /*#__PURE__*/React.createElement("span", {
     className: "text-muted"
   }, "$"), " view_projects"), /*#__PURE__*/React.createElement("a", {
-    href: "Resume.pdf",
+    href: RESUME_PATH,
     target: "_blank",
     rel: "noreferrer",
     className: "inline-flex items-center gap-2 rounded-lg border border-[rgba(255,255,255,0.08)] bg-white/[0.03] px-5 py-2.5 font-mono text-sm font-medium text-muted transition-all hover:border-[rgba(255,255,255,0.15)] hover:bg-white/[0.06] hover:text-ink"
@@ -565,7 +566,7 @@ function Hero() {
     y1: "15",
     x2: "12",
     y2: "3"
-  })), "resume.pdf")), /*#__PURE__*/React.createElement("div", {
+  })), "resume")), /*#__PURE__*/React.createElement("div", {
     className: "reveal is-visible mt-20 flex items-center gap-3 text-xs text-dim",
     style: {
       transitionDelay: "0.32s"
@@ -942,7 +943,7 @@ function TerminalSection() {
       return;
     }
     if (trimmed === "resume") {
-      window.open("Resume.pdf", "_blank");
+      window.open(RESUME_PATH, "_blank", "noopener,noreferrer");
     }
     const cmdData = terminalCommands[trimmed];
     if (cmdData) {
